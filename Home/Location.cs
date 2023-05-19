@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Home
 {
-    abstract class Location
+    public abstract class Location
     {
         public Location(string name)
         {
@@ -14,9 +14,10 @@ namespace Home
         }
         public string Name { get; private set; }
         public Location[] Exits;
-       public virtual string Description
+        public virtual string Description
         {
-           get {
+            get
+            {
                 string description = "Stoisz w " + Name +
                         ". I widzisz wyjścia do następujących lokalizacji: ";
                 for (int i = 0; i < Exits.Length; i++)
@@ -32,24 +33,25 @@ namespace Home
     }
 
 
-    class Room : Location
+    public class Room : Location
     {
-        public Room(string decoration,string Name):base(Name)
+        public Room(string decoration, string Name) : base(Name)
         {
             this.Decoration = decoration;
         }
         private readonly string Decoration;
         public override string Description
         {
-            get { 
-                   string desc = " Widzisz tutaj "+Decoration +".";
+            get
+            {
+                string desc = " W " + Name + " jest " + Decoration + ".";
                 return desc;
             }
         }
     }
 
 
-    class Outside : Location
+    public class Outside : Location
     {
         public Outside(bool hot, string Name) : base(Name)
         {
@@ -60,35 +62,44 @@ namespace Home
         {
             get
             {
-                string desc = " Tutaj jest";
-                desc+= (hot) ?  "gorąco." :  " zimno.";
+                string desc = "Na " + Name + " jest ";
+                desc += (hot) ? "gorąco." : "zimno.";
                 return desc;
             }
         }
     }
 
 
-    interface IHasExteriorDoor
+    public interface IHasExteriorDoor
     {
-        string  DoorDescription { get; }
-         Location DoorLocation { get; set; }
+        string DoorDescription { get; }
+            public Location DoorLocation { get; set; }
     }
 
 
-    class OutsideWithDoor : Outside, IHasExteriorDoor
+    public class OutsideWithDoor : Outside, IHasExteriorDoor
     {
-        public OutsideWithDoor(bool hot, string Name,string doorDescription) : base(hot,Name)
+        public OutsideWithDoor(bool hot, string Name, string doorDescription) : base(hot, Name)
         {
             this._doorDescription = doorDescription;
         }
         private readonly string _doorDescription;
-        public  string DoorDescription { get { return _doorDescription; } }
+        public string DoorDescription { get { return _doorDescription; } }
         public Location DoorLocation { get; set; }
+        public override string Description
+        {
+            get
+            {
+                string desc = base.Description;
+                desc += " " + Name + " ma " + DoorDescription + ".";
+                return desc;
+            }
+        }
     }
 
-    class RoomWithDoor : Room, IHasExteriorDoor
+    public class RoomWithDoor : Room, IHasExteriorDoor
     {
-        public RoomWithDoor(string decoration, string Name, string doorDescription) : base(decoration,Name)
+        public RoomWithDoor(string decoration, string Name, string doorDescription) : base(decoration, Name)
         {
             this._doorDescription = doorDescription;
         }
@@ -97,5 +108,15 @@ namespace Home
         public string DoorDescription { get { return _doorDescription; } }
 
         public Location DoorLocation { get; set; }
+        public override string Description
+        {
+            get
+            {
+                string desc = base.Description;
+                desc += " " + Name + " ma " + DoorDescription + ".";
+                return desc;
+            }
+        }
     }
 }
+
