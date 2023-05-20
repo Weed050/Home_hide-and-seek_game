@@ -3,36 +3,37 @@ namespace Home
     public partial class Form1 : Form
     {
         Location currentLocation;
+
         OutsideWithDoor frontYard;
         OutsideWithDoor backYard;
         Outside garden;
+
         RoomWithDoor livingRoom;
         Room diningRoom;
         RoomWithDoor kitchen;
+
         public Form1()
         {
             InitializeComponent();
             CreateObjects();
-            MoveToANewLocation(garden);
+            MoveToANewLocation(livingRoom);
         }
-        public void CreateObjects()
+       
+        
+        private void CreateObjects()
         {
 
             frontYard = new OutsideWithDoor(true, "podwórko przed domem", "metalowe drzwi");
-            frontYard.DoorLocation =  livingRoom;
 
             backYard = new OutsideWithDoor(false, "podwórko za domem", "metalowe drzwi z plastikow¹ klamk¹");
-            backYard.DoorLocation = kitchen;
 
             garden = new Outside(false, "ogród");
 
             livingRoom = new RoomWithDoor("kwiatki w doniczkach", "salon", "dêbowe drzwi");
-            livingRoom.DoorLocation = frontYard ;
 
             diningRoom = new Room("paprotki", "jadalnia");
 
             kitchen = new RoomWithDoor("obrazy", "kuchnia", "bukowe drewniane drzwi");
-            kitchen.DoorLocation = backYard;
 
             frontYard.Exits = new Location[]
             {
@@ -49,6 +50,12 @@ namespace Home
             livingRoom.Exits = new Location[] { diningRoom };
             diningRoom.Exits = new Location[] { livingRoom, kitchen };
             kitchen.Exits = new Location[] { diningRoom };
+
+            frontYard.DoorLocation = livingRoom;
+            backYard.DoorLocation = kitchen;
+            livingRoom.DoorLocation = frontYard;
+            kitchen.DoorLocation = backYard;
+
         }
 
 
@@ -78,7 +85,7 @@ namespace Home
                 ButtonVisibility(currentLocation);
             }
         }
-        public void ButtonVisibility(Location location)
+        private void ButtonVisibility(Location location)
         {
             goThroughTheDoor.Visible = (location is IHasExteriorDoor);
         }
@@ -92,21 +99,23 @@ namespace Home
 
         private void goThroughTheDoor_Click(object sender, EventArgs e)
         {
+            IHasExteriorDoor location = currentLocation as IHasExteriorDoor;
 
-            IHasExteriorDoor location3 = null;
-            if (currentLocation is RoomWithDoor)
-            {
-                 location3 = currentLocation as IHasExteriorDoor;
-                MoveToANewLocation(location3.DoorLocation);
+            MoveToANewLocation(location.DoorLocation);
+            //IHasExteriorDoor location3 = null;
+            //if (currentLocation is RoomWithDoor)
+            //{
+            //    location3 = currentLocation as IHasExteriorDoor;
+            //    
 
-            }
-            if (currentLocation is OutsideWithDoor)
-            {
-                location3 = currentLocation as IHasExteriorDoor;
-                Location location4 = location3.DoorLocation as Location;
-                MoveToANewLocation(location4);
-
-            }
+            //}
+            //if (currentLocation is OutsideWithDoor)
+            //{
+            //    location3 = currentLocation as IHasExteriorDoor;
+            //    Location location4 = location3.DoorLocation as Location;
+            //    MoveToANewLocation(location4);
+            //    //funkcja do popawienia
+            //}
         }
     }
 }

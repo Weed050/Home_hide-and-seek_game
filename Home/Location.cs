@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Home
 {
-    public abstract class Location
+    abstract class Location
     {
         public Location(string name)
         {
             this.Name = name;
         }
         public string Name { get; private set; }
-        public Location[] Exits;
+        public  Location[] Exits;
         public virtual string Description
         {
             get
@@ -33,7 +33,7 @@ namespace Home
     }
 
 
-    public class Room : Location
+    class Room : Location
     {
         public Room(string decoration, string Name) : base(Name)
         {
@@ -51,7 +51,7 @@ namespace Home
     }
 
 
-    public class Outside : Location
+    class Outside : Location
     {
         public Outside(bool hot, string Name) : base(Name)
         {
@@ -70,14 +70,14 @@ namespace Home
     }
 
 
-    public interface IHasExteriorDoor
+    interface IHasExteriorDoor
     {
         string DoorDescription { get; }
-            public Location DoorLocation { get; set; }
+             Location DoorLocation { get; set; }
     }
 
 
-    public class OutsideWithDoor : Outside, IHasExteriorDoor
+    class OutsideWithDoor : Outside, IHasExteriorDoor
     {
         public OutsideWithDoor(bool hot, string Name, string doorDescription) : base(hot, Name)
         {
@@ -97,7 +97,7 @@ namespace Home
         }
     }
 
-    public class RoomWithDoor : Room, IHasExteriorDoor
+    class RoomWithDoor : Room, IHasExteriorDoor
     {
         public RoomWithDoor(string decoration, string Name, string doorDescription) : base(decoration, Name)
         {
