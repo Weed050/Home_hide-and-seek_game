@@ -13,7 +13,7 @@ namespace Home
             this.Name = name;
         }
         public string Name { get; private set; }
-        public  Location[] Exits;
+        public Location[] Exits;
         public virtual string Description
         {
             get
@@ -73,15 +73,16 @@ namespace Home
     interface IHasExteriorDoor
     {
         string DoorDescription { get; }
-             Location DoorLocation { get; set; }
+        Location DoorLocation { get; set; }
     }
 
 
-    class OutsideWithDoor : Outside, IHasExteriorDoor
+    class OutsideWithDoor : OutsideWithHidingPlace, IHasExteriorDoor
     {
-        public OutsideWithDoor(bool hot, string Name, string doorDescription) : base(hot, Name)
+        public OutsideWithDoor(bool hot, string Name, string doorDescription, string hideout) : base(hot, Name, hideout)
         {
             this._doorDescription = doorDescription;
+            Hideout = hideout;
         }
         private readonly string _doorDescription;
         public string DoorDescription { get { return _doorDescription; } }
@@ -95,13 +96,16 @@ namespace Home
                 return desc;
             }
         }
+
+        public string Hideout { get; }
     }
 
-    class RoomWithDoor : Room, IHasExteriorDoor
+    class RoomWithDoor : RoomWithHidingPlace, IHasExteriorDoor
     {
-        public RoomWithDoor(string decoration, string Name, string doorDescription) : base(decoration, Name)
+        public RoomWithDoor(string decoration, string Name, string doorDescription, string hideout) : base(decoration, Name,hideout)
         {
             this._doorDescription = doorDescription;
+            Hideout = hideout;
         }
         private readonly string _doorDescription;
 
@@ -116,6 +120,68 @@ namespace Home
                 desc += " " + Name + " ma " + DoorDescription + ".";
                 return desc;
             }
+        }
+
+        public string Hideout { get; }
+    }
+    interface IHidingPlace
+    {
+        public string Hideout { get; }
+    }
+    class OutsideWithHidingPlace : Outside, IHidingPlace
+    {
+        public string Hideout
+        {
+            get;
+        }
+        public OutsideWithHidingPlace(bool hot, string name, string _hideout) : base(hot, name)
+        {
+            this.Hideout = _hideout;
+        }
+    }
+
+    class RoomWithHidingPlace : Room, IHidingPlace
+    {
+        public string Hideout { get; }
+        public RoomWithHidingPlace(string decorations, string name, string _hideout) : base(decorations, name)
+        {
+            this.Hideout = _hideout;
+        }
+    }
+    class Opponent
+    {
+        private Location myLocation;
+        public Random random;
+        public Opponent(Location _startingLocalization)
+        {   
+            this.myLocation = _startingLocalization;
+            random = new Random();
+        }
+        public void Move()
+        {
+            do 
+            {
+                Location location = myLocation.Exits[random.Next(myLocation.Exits.Length)];
+                if (location is IHasExteriorDoor)
+                {
+                    if (random.Next(2) == 1)
+                        myLocation = location;
+                    else
+                        //location = myLocation.Exits[random.Next(myLocation.Exits.Length)];
+                        return;
+                }
+                else
+                    myLocation = myLocation.Exits[random.Next(myLocation.Exits.Length)];
+                //metoda chodzi dopuki nie znajdzie miejsca które ma miejsce do schowania
+            } while (myLocation is IHidingPlace);
+           
+        }
+       public bool Check(Location loc)
+        {
+            if (loc == this.myLocation)
+                return true;
+            else
+                return false;
         }
     }
 }

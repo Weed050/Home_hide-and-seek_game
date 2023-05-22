@@ -8,32 +8,44 @@ namespace Home
         OutsideWithDoor backYard;
         Outside garden;
 
-        RoomWithDoor livingRoom;
         Room diningRoom;
+        Room stairs;
+        RoomWithHidingPlace BigSleepingRoom;
+        RoomWithHidingPlace MiddleSleepingRoom;
+        RoomWithHidingPlace BathRoom;
+        RoomWithHidingPlace passageway;
+        RoomWithDoor livingRoom;
         RoomWithDoor kitchen;
 
+        Opponent opponent;
         public Form1()
         {
             InitializeComponent();
             CreateObjects();
             MoveToANewLocation(livingRoom);
         }
-       
-        
+
+
         private void CreateObjects()
         {
+            BigSleepingRoom = new RoomWithHidingPlace("kwiatek","du¿a sypialnia","pod ³ó¿kiem");
+            MiddleSleepingRoom = new RoomWithHidingPlace("obraz pla¿y","œrednia sypialnia","pod ³ó¿kiem");
+            BathRoom = new RoomWithHidingPlace("umywalka", "du¿a sypialnia", "pod prysznicem");
+            passageway = new RoomWithHidingPlace("obrazek z psem", "korytarz", "szafa œcienna");
 
-            frontYard = new OutsideWithDoor(true, "podwórko przed domem", "metalowe drzwi");
+            stairs = new Room("drewniana porêcz", "schody");
 
-            backYard = new OutsideWithDoor(false, "podwórko za domem", "metalowe drzwi z plastikow¹ klamk¹");
+            frontYard = new OutsideWithDoor(true, "podwórko przed domem", "metalowe drzwi", "w namiocie");
+
+            backYard = new OutsideWithDoor(false, "podwórko za domem", "metalowe drzwi z plastikow¹ klamk¹", "pod sto³em");
 
             garden = new Outside(false, "ogród");
 
-            livingRoom = new RoomWithDoor("kwiatki w doniczkach", "salon", "dêbowe drzwi");
+            livingRoom = new RoomWithDoor("kwiatki w doniczkach", "salon", "dêbowe drzwi", "szafa œcienna");
 
             diningRoom = new Room("paprotki", "jadalnia");
 
-            kitchen = new RoomWithDoor("obrazy", "kuchnia", "bukowe drewniane drzwi");
+            kitchen = new RoomWithDoor("obrazy", "kuchnia", "bukowe drewniane drzwi", "szafka");
 
             frontYard.Exits = new Location[]
             {
@@ -47,6 +59,22 @@ namespace Home
             {
                 frontYard,backYard
             };
+            stairs.Exits = new Location[]
+            {
+                livingRoom,passageway
+            };
+            passageway.Exits = new Location[]{
+                stairs,BathRoom,BigSleepingRoom,MiddleSleepingRoom
+            };
+            BigSleepingRoom.Exits = new Location[]{
+                passageway
+            };
+            MiddleSleepingRoom.Exits = new Location[]{
+                passageway
+            };
+            BathRoom.Exits = new Location[]{
+                passageway
+            };
             livingRoom.Exits = new Location[] { diningRoom };
             diningRoom.Exits = new Location[] { livingRoom, kitchen };
             kitchen.Exits = new Location[] { diningRoom };
@@ -55,7 +83,7 @@ namespace Home
             backYard.DoorLocation = kitchen;
             livingRoom.DoorLocation = frontYard;
             kitchen.DoorLocation = backYard;
-
+            opponent = new Opponent(frontYard);
         }
 
 
@@ -92,30 +120,13 @@ namespace Home
 
         private void goThere_Click(object sender, EventArgs e)
         {
-            int i;
-            i = Exits.SelectedIndex;
-            MoveToANewLocation (currentLocation.Exits[i]);
+            MoveToANewLocation(currentLocation.Exits[Exits.SelectedIndex]);
         }
 
         private void goThroughTheDoor_Click(object sender, EventArgs e)
         {
             IHasExteriorDoor location = currentLocation as IHasExteriorDoor;
-
             MoveToANewLocation(location.DoorLocation);
-            //IHasExteriorDoor location3 = null;
-            //if (currentLocation is RoomWithDoor)
-            //{
-            //    location3 = currentLocation as IHasExteriorDoor;
-            //    
-
-            //}
-            //if (currentLocation is OutsideWithDoor)
-            //{
-            //    location3 = currentLocation as IHasExteriorDoor;
-            //    Location location4 = location3.DoorLocation as Location;
-            //    MoveToANewLocation(location4);
-            //    //funkcja do popawienia
-            //}
         }
     }
 }
