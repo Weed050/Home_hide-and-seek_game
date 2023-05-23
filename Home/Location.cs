@@ -157,24 +157,31 @@ namespace Home
             this.myLocation = _startingLocalization;
             random = new Random();
         }
+        private Location GetLocation() 
+            => myLocation.Exits[random.Next(myLocation.Exits.Length)];
+        
         public void Move()
         {
-            do 
+            Location location;
+            do
             {
-                Location location = myLocation.Exits[random.Next(myLocation.Exits.Length)];
+                 location = GetLocation();
                 if (location is IHasExteriorDoor)
                 {
                     if (random.Next(2) == 1)
                         myLocation = location;
-                    else
-                        //location = myLocation.Exits[random.Next(myLocation.Exits.Length)];
-                        return;
                 }
-                else
-                    myLocation = myLocation.Exits[random.Next(myLocation.Exits.Length)];
-                //metoda chodzi dopuki nie znajdzie miejsca które ma miejsce do schowania
-            } while (myLocation is IHidingPlace);
-           
+
+            } while (!(location is IHidingPlace));
+            myLocation = location;
+            
+
+
+            //while (!(myLocation is IHidingPlace))
+            //{
+
+            //}
+
         }
        public bool Check(Location loc)
         {

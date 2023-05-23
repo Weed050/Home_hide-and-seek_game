@@ -6,7 +6,8 @@ namespace Home
 
         OutsideWithDoor frontYard;
         OutsideWithDoor backYard;
-        Outside garden;
+        OutsideWithHidingPlace garden;
+        OutsideWithHidingPlace driveway;
 
         Room diningRoom;
         Room stairs;
@@ -28,8 +29,9 @@ namespace Home
 
         private void CreateObjects()
         {
-            BigSleepingRoom = new RoomWithHidingPlace("kwiatek","du¿a sypialnia","pod ³ó¿kiem");
-            MiddleSleepingRoom = new RoomWithHidingPlace("obraz pla¿y","œrednia sypialnia","pod ³ó¿kiem");
+            driveway = new OutsideWithHidingPlace(true, "droga dojazdowa", "gara¿");
+            BigSleepingRoom = new RoomWithHidingPlace("kwiatek", "du¿a sypialnia", "pod ³ó¿kiem");
+            MiddleSleepingRoom = new RoomWithHidingPlace("obraz pla¿y", "œrednia sypialnia", "pod ³ó¿kiem");
             BathRoom = new RoomWithHidingPlace("umywalka", "du¿a sypialnia", "pod prysznicem");
             passageway = new RoomWithHidingPlace("obrazek z psem", "korytarz", "szafa œcienna");
 
@@ -39,7 +41,7 @@ namespace Home
 
             backYard = new OutsideWithDoor(false, "podwórko za domem", "metalowe drzwi z plastikow¹ klamk¹", "pod sto³em");
 
-            garden = new Outside(false, "ogród");
+            garden = new OutsideWithHidingPlace(false, "ogród", "szopa");
 
             livingRoom = new RoomWithDoor("kwiatki w doniczkach", "salon", "dêbowe drzwi", "szafa œcienna");
 
@@ -78,6 +80,7 @@ namespace Home
             livingRoom.Exits = new Location[] { diningRoom };
             diningRoom.Exits = new Location[] { livingRoom, kitchen };
             kitchen.Exits = new Location[] { diningRoom };
+            driveway.Exits = new Location[] { frontYard, backYard };
 
             frontYard.DoorLocation = livingRoom;
             backYard.DoorLocation = kitchen;
@@ -127,6 +130,29 @@ namespace Home
         {
             IHasExteriorDoor location = currentLocation as IHasExteriorDoor;
             MoveToANewLocation(location.DoorLocation);
+        }
+
+        private void hideYourSelf_Click(object sender, EventArgs e)
+        {
+            for (int i = 10; i > 0; i--)
+            {
+                opponent.Move();
+                DescriptionBox.Text = i.ToString();
+                Update();
+                Thread.Sleep(200);
+            }
+            DescriptionBox.Text = "Gotowy czy nie, idê!";
+            Update();
+            Thread.Sleep(1500);
+            DescriptionBox.Text = "";
+            Update();
+        }
+
+
+
+        private void checkOpponent_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
