@@ -17,6 +17,8 @@ namespace Home
         RoomWithHidingPlace passageway;
         RoomWithDoor livingRoom;
         RoomWithDoor kitchen;
+        int count;
+        int numberOfPassedRooms;
 
         Opponent opponent;
         public Form1()
@@ -24,6 +26,7 @@ namespace Home
             InitializeComponent();
             CreateObjects();
             MoveToANewLocation(livingRoom);
+            RestartGame();
         }
 
 
@@ -32,7 +35,7 @@ namespace Home
             driveway = new OutsideWithHidingPlace(true, "droga dojazdowa", "garaø");
             BigSleepingRoom = new RoomWithHidingPlace("kwiatek", "duøa sypialnia", "pod ≥Ûøkiem");
             MiddleSleepingRoom = new RoomWithHidingPlace("obraz plaøy", "úrednia sypialnia", "pod ≥Ûøkiem");
-            BathRoom = new RoomWithHidingPlace("umywalka", "duøa sypialnia", "pod prysznicem");
+            BathRoom = new RoomWithHidingPlace("umywalka", "≥azienka", "pod prysznicem");
             passageway = new RoomWithHidingPlace("obrazek z psem", "korytarz", "szafa úcienna");
 
             stairs = new Room("drewniana porÍcz", "schody");
@@ -77,7 +80,7 @@ namespace Home
             BathRoom.Exits = new Location[]{
                 passageway
             };
-            livingRoom.Exits = new Location[] { diningRoom };
+            livingRoom.Exits = new Location[] { diningRoom, stairs };
             diningRoom.Exits = new Location[] { livingRoom, kitchen };
             kitchen.Exits = new Location[] { diningRoom };
             driveway.Exits = new Location[] { frontYard, backYard };
@@ -91,29 +94,58 @@ namespace Home
 
 
 
+        private void RedrawForm()
+        {
 
+        }
+        void VisibleButtons()
+        {
+            goThere.Visible = true;
+            Exits.Visible = true;
+            goThroughTheDoor.Visible = true;
+            checkOpponent.Visible = true;
+        }
+        private void RestartGame()
+        {
+            DescriptionBox.Text = "";
+            goThere.Visible = false;
+            Exits.Visible = false;
+            goThroughTheDoor.Visible = false;
+            checkOpponent.Visible = false;
+        }
         private void MoveToANewLocation(Location loc)
         {
-            this.currentLocation = loc;
-            Exits.Items.Clear();
-            foreach (Location l in currentLocation.Exits)
+            if (loc != null)
             {
-                Exits.Items.Add(l.Name);
-            }
-            Exits.SelectedIndex = 0;
-            DescriptionBox.Text = currentLocation.Description;
-
-            for (int i = 0; i < currentLocation.Exits.Length; i++)
-            {
-
-                if (currentLocation is IHasExteriorDoor)
+                this.currentLocation = loc;
+                Exits.Items.Clear();
+                foreach (Location l in currentLocation.Exits)
                 {
-                    IHasExteriorDoor location2 = currentLocation as IHasExteriorDoor;
-                    DescriptionBox.Text += location2.DoorDescription;
+                    Exits.Items.Add(l.Name);
+                }
+                Exits.SelectedIndex = 0;
+                DescriptionBox.Text = currentLocation.Description;
+
+                for (int i = 0; i < currentLocation.Exits.Length; i++)
+                {
+                    if (currentLocation is IHasExteriorDoor)
+                    {
+                        IHasExteriorDoor location2 = currentLocation as IHasExteriorDoor;
+                        DescriptionBox.Text += location2.DoorDescription;
+                    }
+                    DescriptionBox.Text += currentLocation.Exits[i].Description;
+                    ButtonVisibility(currentLocation);
                 }
 
-                DescriptionBox.Text += currentLocation.Exits[i].Description;
-                ButtonVisibility(currentLocation);
+                //text in checkOpponent button
+                if (currentLocation is IHidingPlace)
+                {
+                    IHidingPlace place = currentLocation as IHidingPlace;
+                    checkOpponent.Text = "Sprawdü " + place.Hideout + ".";
+                }
+                else
+                    checkOpponent.Text = "---";
+                this.Text = currentLocation.Name;
             }
         }
         private void ButtonVisibility(Location location)
@@ -128,12 +160,14 @@ namespace Home
 
         private void goThroughTheDoor_Click(object sender, EventArgs e)
         {
+            numberOfPassedRooms++;
             IHasExteriorDoor location = currentLocation as IHasExteriorDoor;
             MoveToANewLocation(location.DoorLocation);
         }
 
         private void hideYourSelf_Click(object sender, EventArgs e)
         {
+            VisibleButtons();
             for (int i = 10; i > 0; i--)
             {
                 opponent.Move();
@@ -144,15 +178,30 @@ namespace Home
             DescriptionBox.Text = "Gotowy czy nie, idÍ!";
             Update();
             Thread.Sleep(1500);
-            DescriptionBox.Text = "";
+            DescriptionBox.Text = currentLocation.Description;
+            this.Text = currentLocation.Name;
             Update();
+            numberOfPassedRooms++;
         }
 
 
 
         private void checkOpponent_Click(object sender, EventArgs e)
         {
-
+            count++;
+            if (opponent.Check(this.currentLocation))
+            {
+                MessageBox.Show( "Znaza≥eú mnie w  "+ count +"  ruchach. \n W miÍdzyczasie przeszed≥eú przez "+numberOfPassedRooms+" lokalizacji.","Brawo!");
+                RestartGame();
+            }
+            else
+            {
+                DescriptionBox.Text = "èle, szukaj dalej.";
+                Update();
+                Thread.Sleep (1500);
+                DescriptionBox.Text = currentLocation.Description;
+                Update();
+            }
         }
     }
 }
